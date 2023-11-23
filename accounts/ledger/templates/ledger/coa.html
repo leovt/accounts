@@ -1,0 +1,34 @@
+<h1>Chart of Accounts</h1>
+<style>
+  .classification {
+    background-color: lightgray;
+    font-weight: bold;
+  }
+  .level1 { padding-left: 1em }
+  .level2 { padding-left: 2em }
+  .level3 { padding-left: 3em }
+  .level4 { padding-left: 4em }
+  .level5 { padding-left: 5em }
+  table {
+    font-family: monospace;
+  }
+  th {
+    text-align: left;
+  }
+</style>
+<table>
+  <thead>
+    <tr><th>Number</th><th>Short Name</th><th>Long Name</th></tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+    {% if row.level %}
+    <td class="classification level{{row.level}}" colspan="3">{{row.name}}</td>
+    {% else %}
+    <td>{{row.number}}</td><td>{{row.short_name}}</td><td>{{row.long_name}}</td>
+    {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
