@@ -1,4 +1,8 @@
+import csv
+import io
+
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 
 from .models import Account, Classification
 
@@ -27,3 +31,23 @@ def chart_of_accounts(request):
         rows.append(Bag(level=0, name="Unclassified"))
         rows.extend(account for account in Account.objects.all() if account.number in unclassified)
     return render(request, "ledger/coa.html", {'rows':rows})
+
+def import_csv(request):
+    from .forms import UploadFileForm
+    if request.method == "POST":
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            content = request.FILES["file"].read().decode('utf-8')
+            filename = request.FILES["file"].name
+            print(filename)
+            reader = csv.DictReader(io.StringIO(content))
+            for line in reader:
+                print(line)
+                break
+            #return HttpResponseRedirect("/success/url/")
+    else:
+        form = UploadFileForm()
+    return render(request, "ledger/upload.html", {"form": form})
+
+def import_task(request):
+    pass

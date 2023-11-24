@@ -28,8 +28,24 @@ class Account(models.Model):
 
 class Transaction(models.Model):
     description = models.CharField(max_length=200)
+    date = models.DateTimeField()
+    source = models.CharField(max_length=200)
     def __str__(self):
         return self.description
+
+class ImportTask(models.Model):
+    source = models.CharField(max_length=200)
+
+
+class ImportedEntry(models.Model):
+    class Meta:
+        ordering = ["task", "serial"]
+        unique_together = [["task", "serial"]]
+    task = models.ForeignKey(ImportTask, on_delete=models.CASCADE)
+    serial = models.IntegerField()
+    data = models.JSONField()
+    transaction = models.ForeignKey(Transaction, null=True, on_delete=models.SET_NULL)
+
 
 class Entry(models.Model):
     DEBIT = "DR"
