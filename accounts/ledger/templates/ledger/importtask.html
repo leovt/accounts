@@ -1,0 +1,28 @@
+<style>
+  table {
+    font-family: monospace;
+    background-color: lightgray;
+  }
+  th {
+    text-align: left;
+  }
+  table tr:nth-child(odd) td{
+      background-color: lightblue;
+  }
+  table tr:nth-child(even) td{
+    background-color: white;      
+  }</style>
+<p>{{source}}</p>
+<table>
+  <tr>
+    {% for field in fieldnames %}
+    <th>{{field}}</th>
+    {% endfor %}
+  </tr>
+  {% for entry in entries %}
+  <tr>
+    {% for field in fieldnames %}
+    <td>{{entry|get_item:field}}</td>
+    {% endfor %}
+  </tr>  {% endfor %}
+</table>

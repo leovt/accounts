@@ -1,10 +1,15 @@
 import csv
 import io
 
-from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
 
-from .models import Account, Classification
+from .models import Account, Classification, ImportTask, ImportedEntry
+
+from django.template.defaulttags import register
+
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)
 
 class Bag:
     def __init__(self, **kwargs):
@@ -39,15 +44,23 @@ def import_csv(request):
         if form.is_valid():
             content = request.FILES["file"].read().decode('utf-8')
             filename = request.FILES["file"].name
-            print(filename)
             reader = csv.DictReader(io.StringIO(content))
-            for line in reader:
-                print(line)
-                break
-            #return HttpResponseRedirect("/success/url/")
+            task = ImportTask(source=filename, fieldnames=reader.fieldnames)
+            from django.db import transaction
+            with transaction.atomic():
+                task.save()
+                for serial, data in enumerate(reader):
+                    entry = ImportedEntry(task=task, serial=serial, data=data)
+                    entry.save()
+            return redirect('import_task', task.id)
     else:
         form = UploadFileForm()
     return render(request, "ledger/upload.html", {"form": form})
 
-def import_task(request):
-    pass
+def import_task(request, task_id):
+    task = get_object_or_404(ImportTask, id=task_id)
+    return render(request, "ledger/importtask.html", {
+        'source':task.source,
+        'fieldnames':task.fieldnames,
+        'entries': [x.data for x in task.entries.all()],
+    })

@@ -35,17 +35,19 @@ class Transaction(models.Model):
 
 class ImportTask(models.Model):
     source = models.CharField(max_length=200)
+    fieldnames = models.JSONField(default=list)
 
 
 class ImportedEntry(models.Model):
     class Meta:
         ordering = ["task", "serial"]
         unique_together = [["task", "serial"]]
-    task = models.ForeignKey(ImportTask, on_delete=models.CASCADE)
+    task = models.ForeignKey(ImportTask, on_delete=models.CASCADE, related_name="entries")
     serial = models.IntegerField()
     data = models.JSONField()
     transaction = models.ForeignKey(Transaction, null=True, on_delete=models.SET_NULL)
-
+    def __str__(self):
+        return str(self.data)
 
 class Entry(models.Model):
     DEBIT = "DR"
