@@ -47,9 +47,20 @@ class Transaction(models.Model):
     def __str__(self):
         return self.description
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("transaction", kwargs={"transaction_id": self.id})
+
 class ImportTask(models.Model):
     source = models.CharField(max_length=200)
     fieldnames = models.JSONField(default=list)
+
+    def __str__(self):
+        return self.source
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("import_task", kwargs={"task_id": self.id})
 
 class ImportedEntry(models.Model):
     class Meta:
@@ -60,7 +71,10 @@ class ImportedEntry(models.Model):
     data = models.JSONField()
     transaction = models.ForeignKey(Transaction, null=True, on_delete=models.SET_NULL)
     def __str__(self):
-        return str(self.data)
+        return f'{self.task}:{self.serial}'
+    def get_absolute_url(self):
+        return f'{self.task.get_absolute_url()}#{self.id}'
+
 
 class Entry(models.Model):
     DEBIT = "DR"

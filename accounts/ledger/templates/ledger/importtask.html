@@ -15,14 +15,18 @@
 <p>{{source}}</p>
 <table>
   <tr>
+    <th>#</th>
     {% for field in fieldnames %}
     <th>{{field}}</th>
     {% endfor %}
+    <th>Assigned Transaction</th>
   </tr>
   {% for entry in entries %}
-  <tr>
+  <tr id="{{entry.id}}">
+    <td>{{entry.serial}}</td>
     {% for field in fieldnames %}
-    <td>{{entry|get_item:field}}</td>
+    <td>{{entry.data|get_item:field}}</td>
     {% endfor %}
+    <td>{% if entry.transaction %}<a href="{{entry.transaction.get_absolute_url}}">{{entry.transaction}}</a>{% endif %}</td>
   </tr>  {% endfor %}
 </table>

@@ -62,11 +62,12 @@ def import_task(request, task_id):
     return render(request, "ledger/importtask.html", {
         'source':task.source,
         'fieldnames':task.fieldnames,
-        'entries': [x.data for x in task.entries.all()],
+        'entries': task.entries.all(),
     })
 
 def transaction(request, transaction_id):
     trans = get_object_or_404(Transaction, id=transaction_id)
+    trans.importedentry_set.all()
     return render(request, "ledger/transaction.html", {'transaction': trans})
 
 def balances(request, period_id):

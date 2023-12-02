@@ -22,6 +22,7 @@
 <p>Source: {{transaction.source}}</p>
 <p>Period: {{transaction.period}}</p>
 <p>Date: {{transaction.date}}</p>
+<p>Imported From: <a href="{{transaction.importedentry_set.all.0.get_absolute_url}}">{{transaction.importedentry_set.all.0}}</a></p>
 <h2>Entries</h2>
 <table>
   <tr><th>Account No</th><th>Etype</th><th>Account Name</th><th>Amount</th><th>Currency</th></tr>
