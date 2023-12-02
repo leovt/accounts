@@ -3,7 +3,7 @@ import io
 
 from django.shortcuts import render, get_object_or_404, redirect
 
-from .models import Account, Classification, ImportTask, ImportedEntry
+from .models import Account, Classification, ImportTask, ImportedEntry, Transaction, Period
 
 from django.template.defaulttags import register
 
@@ -64,3 +64,30 @@ def import_task(request, task_id):
         'fieldnames':task.fieldnames,
         'entries': [x.data for x in task.entries.all()],
     })
+
+def transaction(request, transaction_id):
+    trans = get_object_or_404(Transaction, id=transaction_id)
+    return render(request, "ledger/transaction.html", {'transaction': trans})
+
+def balances(request, period_id):
+    period = get_object_or_404(Period, id=period_id)
+    unclassified = set(account.number for account in Account.objects.all())
+    seen = set()
+    todo = [("Root", 0)]
+    rows = []
+    while todo:
+        cid, level = todo.pop()
+        if cid in seen:
+            #TODO: add warning
+            continue
+        seen.add(cid)
+        classification = Classification.objects.get(id=cid)
+        todo.extend(reversed([(x.id, level+1) for x in classification.children.all()]))
+        rows.append(Bag(level=level, name=str(classification)))
+        for account in classification.account_set.all():
+            rows.append(Bag(number=account.number, name=account.short_name, balance=account.get_balance(period)))
+            unclassified.discard(account.number)
+    if unclassified:
+        rows.append(Bag(level=0, name="Unclassified"))
+        rows.extend(account for account in Account.objects.all() if account.number in unclassified)
+    return render(request, "ledger/balance.html", {'rows':rows, period:period})

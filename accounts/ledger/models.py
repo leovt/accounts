@@ -4,6 +4,15 @@ class Currency(models.Model):
     class Meta:
         verbose_name_plural = "currencies"
     code = models.CharField(max_length=3, primary_key=True)
+    def __str__(self):
+        return self.code
+
+class Period(models.Model):
+    id = models.CharField(max_length=8, primary_key=True)
+    start = models.DateField()
+    end = models.DateField()
+    def __str__(self):
+        return self.id
 
 class Classification(models.Model):
     class Meta:
@@ -26,8 +35,13 @@ class Account(models.Model):
     def __str__(self):
         return f"{self.number} - {self.short_name}"
 
+    def get_balance(self, period):
+        return sum(entry.amount
+            for entry in self.entries.all() if entry.transaction.period==period)
+
 class Transaction(models.Model):
     description = models.CharField(max_length=200)
+    period = models.ForeignKey(Period, on_delete=models.RESTRICT)
     date = models.DateTimeField()
     source = models.CharField(max_length=200)
     def __str__(self):
@@ -36,7 +50,6 @@ class Transaction(models.Model):
 class ImportTask(models.Model):
     source = models.CharField(max_length=200)
     fieldnames = models.JSONField(default=list)
-
 
 class ImportedEntry(models.Model):
     class Meta:
@@ -53,9 +66,12 @@ class Entry(models.Model):
     DEBIT = "DR"
     CREDIT = "CR"
 
-    transaction = models.ForeignKey(Transaction, null=False, on_delete=models.CASCADE)
-    account = models.ForeignKey(Account, null=False, on_delete=models.RESTRICT)
+    transaction = models.ForeignKey(Transaction, null=False, on_delete=models.CASCADE, related_name='entries')
+    account = models.ForeignKey(Account, null=False, on_delete=models.RESTRICT, related_name='entries')
     currency = models.ForeignKey(Currency, null=False, on_delete=models.RESTRICT, related_name='+')
     etype = models.CharField(max_length=2, blank=False, null=False,
         choices = ((DEBIT, "Debit"), (CREDIT, "Credit")))
     amount = models.DecimalField(max_digits=16, decimal_places=4)
+
+    def __str__(self):
+        return f"{self.account.number} {self.etype} {self.amount} {self.currency}"

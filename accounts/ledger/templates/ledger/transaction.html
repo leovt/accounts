@@ -1,0 +1,37 @@
+<style>
+  table {
+    font-family: monospace;
+    background-color: lightgray;
+  }
+  th {
+    text-align: left;
+  }
+  table tr:nth-child(odd) td{
+      background-color: lightblue;
+  }
+  table tr:nth-child(even) td{
+    background-color: white;
+  }
+  td.amount {
+    text-align:right;
+  }
+</style>
+<h1>Transaction {{transaction.id}}</h1>
+<h2>Transaction header</h2>
+<p>Description: {{transaction.description}}</p>
+<p>Source: {{transaction.source}}</p>
+<p>Period: {{transaction.period}}</p>
+<p>Date: {{transaction.date}}</p>
+<h2>Entries</h2>
+<table>
+  <tr><th>Account No</th><th>Etype</th><th>Account Name</th><th>Amount</th><th>Currency</th></tr>
+  {% for entry in transaction.entries.all %}
+  <tr>
+    <td>{{entry.account.number}}</td>
+    <td>{{entry.etype}}</td>
+    <td>{{entry.account.short_name}}</td>
+    <td class="amount">{{entry.amount}}</td>
+    <td>{{entry.currency}}</td>
+  </tr>
+  {% endfor %}
+</table>
