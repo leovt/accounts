@@ -69,11 +69,17 @@ class ImportedEntry(models.Model):
     task = models.ForeignKey(ImportTask, on_delete=models.CASCADE, related_name="entries")
     serial = models.IntegerField()
     data = models.JSONField()
+    account_hint = models.ForeignKey(Account, null=True, on_delete=models.SET_NULL)
     transaction = models.ForeignKey(Transaction, null=True, on_delete=models.SET_NULL)
     def __str__(self):
         return f'{self.task}:{self.serial}'
     def get_absolute_url(self):
         return f'{self.task.get_absolute_url()}#{self.id}'
+
+    def get_import_url(self):
+        from django.urls import reverse
+        return reverse("import_transaction", kwargs={"import_entry_id": self.id})
+
 
 
 class Entry(models.Model):

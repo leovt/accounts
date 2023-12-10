@@ -1,0 +1,70 @@
+<style>
+  table {
+    font-family: monospace;
+    background-color: lightgray;
+  }
+  th {
+    text-align: left;
+  }
+  table tr:nth-child(odd) td{
+      background-color: lightblue;
+  }
+  table tr:nth-child(even) td{
+    background-color: white;
+  }
+input[type="number"]{
+text-align: right;
+  }
+</style>
+<h2>ImportedEntry</h2>
+    <p>From {{source}}</p>
+    <table>
+  <tr>
+    <th>#</th>
+    {% for field in fieldnames %}
+    <th>{{field}}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>{{ientry.serial}}</td>
+    {% for field in fieldnames %}
+    <td>{{ientry.data|get_item:field}}</td>
+    {% endfor %}
+  </tr>
+    </table>
+
+    <h2>Transaction</h2>
+
+    <h3>Entries</h3>
+{{ entry_formset.non_form_errors.as_ul }}
+    <form method="POST">{% csrf_token %}
+{{ entry_formset.management_form }}
+      <table>
+{% for form in entry_formset.forms %}
+  {% if forloop.first %}
+  <thead><tr>
+    {% for field in form.visible_fields %}
+    <th>{{ field.label|capfirst }}</th>
+    {% endfor %}
+  </tr></thead>
+  {% endif %}
+  <tr class="{% cycle row1 row2 %}">
+  {% for field in form.visible_fields %}
+    <td>
+    {# Include the hidden fields in the form #}
+    {% if forloop.first %}
+      {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+      {% endfor %}
+    {% endif %}
+      {{ field.errors.as_ul }}
+      {{ field }}
+    </td>
+  {% endfor %}
+  </tr>
+{% endfor %}
+</table>
+      <button type="submit" name="action" value="save">Save</button>
+      <button type="submit" name="action" value="save_next">Save And Next</button>
+</form>
+{% include "ledger/cheatsheet.html" %}

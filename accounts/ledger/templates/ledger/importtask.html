@@ -27,6 +27,7 @@
     {% for field in fieldnames %}
     <td>{{entry.data|get_item:field}}</td>
     {% endfor %}
-    <td>{% if entry.transaction %}<a href="{{entry.transaction.get_absolute_url}}">{{entry.transaction}}</a>{% endif %}</td>
+    <td>{% if entry.transaction %}<a href="{{entry.transaction.get_absolute_url}}">{{entry.transaction}}</a>
+      {% else %}<a href="{{entry.get_import_url}}">Create New Transaction</a>{% endif %}</td>
   </tr>  {% endfor %}
 </table>

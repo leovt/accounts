@@ -2,8 +2,11 @@ import csv
 import io
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseBadRequest
 
 from .models import Account, Classification, ImportTask, ImportedEntry, Transaction, Period
+
+from .forms import EntryFormSet
 
 from django.template.defaulttags import register
 
@@ -63,6 +66,40 @@ def import_task(request, task_id):
         'source':task.source,
         'fieldnames':task.fieldnames,
         'entries': task.entries.all(),
+        'accounts': Account.objects.all(),
+    })
+
+def import_transaction(request, import_entry_id):
+    from .transaction_classifiers import revolut
+    ientry = get_object_or_404(ImportedEntry, id=import_entry_id)
+    initial = [{'transaction':ientry.transaction}]*10
+    if request.method == "POST":
+        form = EntryFormSet(request.POST, initial=initial)
+        if form.is_valid():
+            if request.POST['action'] == 'save':
+                form.save()
+                return redirect('import_task', ientry.task.id)
+            elif request.POST['action'] == 'save_next':
+                form.save()
+                try:
+                    next_entry = ImportedEntry.objects.get(task=ientry.task, serial=ientry.serial+1)
+                except ImportedEntry.DoesNotExist:
+                    return redirect('import_task', ientry.task.id)
+                return redirect('import_transaction', next_entry.id)
+            else:
+                return HttpResponseBadRequest("invalid action")
+    else:
+        if ientry.transaction is None:
+            transaction = revolut(ientry.data)
+            ientry.transaction = transaction
+            ientry.save()
+        form = EntryFormSet(queryset=ientry.transaction.entries.all(), initial=initial)
+    return render(request, "ledger/import_transaction.html", {
+        'source': ientry.task.source,
+        'fieldnames': ientry.task.fieldnames,
+        'ientry': ientry,
+        'transaction': ientry.transaction,
+        'entry_formset': form,
     })
 
 def transaction(request, transaction_id):

@@ -1,0 +1,53 @@
+<style>
+    table.AccountTee {
+        background-color: white;
+        margin: 2ex 2em;
+        border-collapse: collapse;
+    }
+    table.AccountTee tr:nth-child(2) th{
+        border-bottom: 2px solid black;
+    }
+    table.AccountTee tr {
+        border: none;
+    }
+    table.AccountTee th,
+    table.AccountTee td{
+        text-align: center;
+        padding: 5px 2ex;
+    }
+    table.AccountTee tr td:nth-child(2),
+    table.AccountTee th:nth-child(2){
+      border-left: solid 2px black;
+    }
+
+    div.cheatsheet {
+        display: flex;
+    }
+</style>
+
+<div class="cheatsheet">
+    <table class="AccountTee">
+        <tr><th colspan="2">Asset Account</th></tr>
+        <tr><th>Debit (DR)</th><th>Credit (CR)</th></tr>
+        <tr><td>Increase</td><td>Reduction</td></tr>
+        <tr><td>Sign Convention: +</td><td>Sign Convention: &minus;</td></tr>
+    </table>
+    <table class="AccountTee">
+        <tr><th colspan="2">Liabiliy Account</th></tr>
+        <tr><th>Debit (DR)</th><th>Credit (CR)</th></tr>
+        <tr><td>Reduction</td><td>Increase</td></tr>
+        <tr><td>Sign Convention: +</td><td>Sign Convention: &minus;</td></tr>
+    </table>
+    <table class="AccountTee">
+        <tr><th colspan="2">Expense Account</th></tr>
+        <tr><th>Debit (DR)</th><th>Credit (CR)</th></tr>
+        <tr><td>Expense</td><td></td></tr>
+        <tr><td>Sign Convention: +</td><td>Sign Convention: &minus;</td></tr>
+    </table>
+    <table class="AccountTee">
+        <tr><th colspan="2">Revenue Account</th></tr>
+        <tr><th>Debit (DR)</th><th>Credit (CR)</th></tr>
+        <tr><td></td><td>Revenue</td></tr>
+        <tr><td>Sign Convention: +</td><td>Sign Convention: &minus;</td></tr>
+    </table>
+</div>
